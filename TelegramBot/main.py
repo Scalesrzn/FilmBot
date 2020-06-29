@@ -5,6 +5,7 @@ import random
 bot = telebot.TeleBot('1204715671:AAHjmYwhCzAJ8rypKztW9b76VLST8yh-YE4')
 add_flag = ''
 
+#Говнофлаг для добавления ссылки на фильм....
 def FilmAddFlag(flag):
     global add_flag
     if flag == 'True':
@@ -12,8 +13,18 @@ def FilmAddFlag(flag):
     else:
         add_flag = flag
 
+#Запись в конец файла
+def AppendFile(film):
+    txtfile = open('film.txt', 'a')
+    txtfile.write(film + '\n')
+    txtfile.close()
 
+def ChoiceFilm():
+    Film = random.choice(list(open('film.txt')))
+    return Film.rstrip('\n')
 
+#функция удаления
+  
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
 
@@ -34,7 +45,12 @@ def send_welcome(message):
         bot.reply_to(message, 
         random.choice(reply_for_Millanteria))
         bot.send_message(message.chat.id, "Напиши /add, чтобы добавить фильм в библиотеку!")
-
+#Генерируем фильм из списка
+@bot.message_handler(commands=['film'])
+def get_film(message):
+    bot.reply_to(message,"Держи! Надеюсь я не получу по своему....кхм...коду за этот фильм!")
+    bot.send_message(message.chat.id, "Рекомендую '" + ChoiceFilm() + "'!")
+#Добавляем фильм в библиотеку
 @bot.message_handler(commands=['add'])
 def add_film(message):
     bot.send_message(message.chat.id, 'Отлично! Теперь дайте ссылку на фильм или напиши его название...!')
@@ -45,14 +61,14 @@ def echo_msg(message):
     global add_flag
     if add_flag =='True':
         if message.from_user.id == 333679335:
+            AppendFile(message.text)
             bot.send_message(message.chat.id, "Фильм '" + message.text + "' добавлен в библиотеку")
         else:
+            AppendFile(message.text)
             bot.send_message(message.chat.id, "Фильм '" + message.text + "' добавлен в библиотеку")
             bot.send_message(message.chat.id, "Отлично Мурчалка! Как всегда отличный фильм!")
         FilmAddFlag('False')
 
-@bot.message_handler(func=lambda message: True)
-def echo_all(message):
-	bot.reply_to(message, message.text)
+
 
 bot.polling()
